@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo A v2 — SPEN 2026 · Lenguaje y Comunicación</title>
+<style>
+:root{
+  --bg:#0f1117;--card:#1a1d27;--border:#2a2d3e;
+  --accent:#4fc3f7;--green:#4caf50;--red:#f44336;
+  --text:#e8eaf0;--muted:#9aa0b4;--orange:#ff9800;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+.pantalla{display:none;}
+.pantalla.activa{display:block;}
+#inicio.activa{display:flex;flex-direction:column;align-items:center;}
+#inicio{max-width:720px;margin:0 auto;padding:36px 20px;gap:18px;}
+.logo{text-align:center;}
+.logo h1{font-size:1.85rem;color:var(--accent);letter-spacing:1px;}
+.logo .sub{color:var(--muted);margin-top:5px;font-size:.85rem;}
+.logo .badge{display:inline-block;margin-top:8px;font-size:.72rem;padding:3px 10px;border-radius:20px;
+  background:rgba(76,175,80,.15);color:var(--green);border:1px solid rgba(76,175,80,.3);}
+#banner-prog{background:var(--card);border:1px solid var(--accent);border-radius:12px;padding:16px;width:100%;display:none;}
+#banner-prog h3{color:var(--accent);margin-bottom:8px;font-size:.9rem;}
+#banner-prog p{color:var(--muted);font-size:.82rem;margin-bottom:12px;}
+.row{display:flex;gap:8px;flex-wrap:wrap;}
+.sel-wrap{width:100%;}
+.sel-wrap h2{font-size:.86rem;color:var(--muted);margin-bottom:10px;text-align:center;font-weight:500;}
+.bloques-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
+.bcard{background:var(--card);border:2px solid var(--border);border-radius:9px;
+  padding:11px 13px;cursor:pointer;transition:.15s;display:flex;justify-content:space-between;align-items:center;}
+.bcard:hover{border-color:var(--accent);}
+.bcard.sel{border-color:var(--accent);background:rgba(79,195,247,.07);}
+.bcard .bn{font-size:.81rem;font-weight:600;}
+.bcard .bc{font-size:.7rem;color:var(--muted);}
+.bcard .bp{font-size:.7rem;color:var(--accent);}
+.btn-todos{width:100%;padding:11px;border-radius:8px;background:var(--border);
+  border:2px dashed #3a3d4e;color:var(--muted);cursor:pointer;font-size:.84rem;
+  font-weight:600;transition:.15s;margin-top:4px;}
+.btn-todos:hover,.btn-todos.sel{border-color:var(--accent);color:var(--accent);background:rgba(79,195,247,.07);}
+.info-l{color:var(--muted);font-size:.8rem;line-height:2.1;text-align:center;}
+.btn{padding:11px 22px;border-radius:8px;font-size:.92rem;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-p{background:var(--accent);color:#000;}.btn-p:hover{filter:brightness(1.1);}
+.btn-s{background:var(--border);color:var(--text);}.btn-s:hover{background:#3a3d4e;}
+.btn-d{background:var(--red);color:#fff;}.btn-d:hover{background:#c62828;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+/* EXAMEN */
+#examen{padding-bottom:50px;}
+.hdr{position:sticky;top:0;z-index:100;background:var(--card);
+  border-bottom:1px solid var(--border);padding:9px 14px;
+  display:flex;align-items:center;gap:9px;}
+.hpi{font-size:.78rem;color:var(--muted);white-space:nowrap;}
+.pbw{flex:1;background:var(--border);border-radius:3px;height:5px;min-width:20px;}
+.pb{height:5px;border-radius:3px;background:var(--accent);transition:width .3s;}
+.hblq{font-size:.69rem;color:var(--accent);background:rgba(79,195,247,.1);
+  border:1px solid rgba(79,195,247,.22);border-radius:20px;padding:3px 9px;
+  white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.sv{font-size:.68rem;color:var(--green);opacity:0;transition:opacity .3s;white-space:nowrap;}
+.sv.show{opacity:1;}
+.btn-mh{background:var(--border);border:none;border-radius:7px;
+  padding:5px 9px;cursor:pointer;color:var(--muted);font-size:.74rem;white-space:nowrap;transition:.15s;}
+.btn-mh:hover{background:#3a3d4e;color:var(--text);}
+.ebody{max-width:860px;margin:0 auto;padding:22px 20px;}
+/* TEXTO */
+.texto-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:20px 24px;margin-bottom:20px;border-left:4px solid var(--accent);}
+.texto-aviso{font-size:.71rem;color:var(--orange);margin-bottom:8px;font-weight:600;}
+.texto-titulo{font-size:.78rem;color:var(--accent);font-weight:700;margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:.5px;}
+.texto-cuerpo{font-size:.9rem;line-height:1.82;color:var(--text);white-space:pre-wrap;}
+.texto-oculto{font-size:.81rem;color:var(--muted);font-style:italic;padding:12px;
+  background:rgba(255,152,0,.06);border:1px solid rgba(255,152,0,.18);border-radius:8px;margin-bottom:20px;}
+/* REACTIVO */
+.rnum{font-size:.74rem;color:var(--muted);margin-bottom:5px;}
+.rblq{display:inline-block;font-size:.68rem;padding:2px 8px;border-radius:4px;
+  background:rgba(79,195,247,.09);color:var(--accent);border:1px solid rgba(79,195,247,.18);margin-bottom:11px;}
+.enun{font-size:.97rem;line-height:1.75;white-space:pre-wrap;margin-bottom:18px;
+  background:rgba(255,255,255,.03);border-radius:8px;padding:14px;border:1px solid var(--border);}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:10px;
+  padding:12px 15px;text-align:left;cursor:pointer;font-size:.93rem;color:var(--text);
+  transition:.15s;display:flex;gap:10px;align-items:flex-start;line-height:1.55;width:100%;}
+.opt:hover:not(:disabled){border-color:var(--accent);}
+.opt.sel{border-color:var(--accent);background:rgba(79,195,247,.07);}
+.opt.ok{border-color:var(--green)!important;background:rgba(76,175,80,.12)!important;color:var(--green)!important;}
+.opt.mal{border-color:var(--red)!important;background:rgba(244,67,54,.09)!important;color:var(--red)!important;}
+.opt.ok-rev{border-color:var(--green);background:rgba(76,175,80,.07);}
+.opt:disabled{cursor:default;}
+.ltr{font-weight:700;min-width:20px;}
+.corr-panel{border-radius:11px;padding:16px;margin-bottom:16px;display:none;border-left:4px solid var(--green);}
+.corr-panel.ok-p{background:rgba(76,175,80,.08);border-left-color:var(--green);}
+.corr-panel.err-p{background:rgba(244,67,54,.07);border-left-color:var(--red);}
+.corr-panel .ct{font-size:.95rem;font-weight:700;margin-bottom:8px;}
+.corr-panel .jt{font-size:.86rem;color:var(--muted);line-height:1.6;}
+.navbtns{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:6px;flex-wrap:wrap;}
+.navleft{display:flex;gap:8px;}
+#navlat{position:fixed;right:6px;top:70px;background:var(--card);border:1px solid var(--border);
+  border-radius:11px;padding:7px;width:38px;display:flex;flex-direction:column;gap:3px;
+  max-height:calc(100vh - 100px);overflow-y:auto;z-index:50;}
+.nd{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--bg);
+  cursor:pointer;font-size:.55rem;font-weight:700;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;transition:.15s;}
+.nd:hover{border-color:var(--accent);}
+.nd.act{border-color:var(--accent);background:var(--accent);color:#000;}
+.nd.ok{border-color:var(--green);background:rgba(76,175,80,.3);color:var(--green);}
+.nd.mal{border-color:var(--red);background:rgba(244,67,54,.3);color:var(--red);}
+.nd.pend{opacity:.28;cursor:default;}
+@media(max-width:860px){#navlat{display:none;}}
+/* RESULTADOS */
+#resultados{max-width:840px;margin:0 auto;padding:28px 20px;}
+.rhead{text-align:center;margin-bottom:24px;}
+.rhead h2{font-size:1.45rem;margin-bottom:6px;}
+.calg{font-size:3.2rem;font-weight:700;margin:8px 0;}
+.calg.ap{color:var(--green);}.calg.rep{color:var(--red);}
+.rsub{color:var(--muted);font-size:.84rem;}
+.bres-wrap{display:flex;flex-direction:column;gap:7px;margin-bottom:24px;}
+.bres{background:var(--card);border:1px solid var(--border);border-radius:9px;
+  padding:12px 15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.bres-nm{font-size:.84rem;font-weight:600;}
+.bres-r{display:flex;gap:12px;align-items:center;}
+.bres-bar{width:90px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.bres-bf{height:100%;border-radius:2px;transition:width 1s;}
+.bres-det{font-size:.73rem;color:var(--muted);}
+.bres-cal{font-size:.95rem;font-weight:700;}
+.bres-cal.ap{color:var(--green);}.bres-cal.rep{color:var(--red);}
+.acres{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:22px;}
+.twrap2{overflow-x:auto;margin-bottom:30px;}
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+th{background:var(--card);color:var(--muted);padding:8px 6px;text-align:left;white-space:nowrap;}
+td{padding:6px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:hover td{background:rgba(255,255,255,.025);}
+.tdp{max-width:200px;}
+.bok{color:var(--green);font-weight:700;}.bmal{color:var(--red);font-weight:700;}
+.bjust{background:var(--border);border:none;border-radius:5px;padding:3px 8px;cursor:pointer;color:var(--text);font-size:.74rem;}
+.bjust.inc{background:rgba(244,67,54,.18);color:var(--red);}
+.bjust:hover{background:#3a3d4e;}
+#movlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+#movlay.show{display:flex;}
+.mbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;
+  max-width:640px;width:100%;max-height:88vh;overflow-y:auto;}
+.mbox h3{font-size:.95rem;color:var(--accent);margin-bottom:10px;}
+.mbox .menum{white-space:pre-wrap;font-size:.88rem;line-height:1.65;margin-bottom:13px;
+  background:var(--bg);padding:12px;border-radius:8px;}
+.mbox .mresp{padding:9px;border-radius:7px;margin-bottom:8px;font-size:.84rem;}
+.mbox .mresp.ok{background:rgba(76,175,80,.15);border:1px solid var(--green);color:var(--green);}
+.mbox .mresp.mal{background:rgba(244,67,54,.15);border:1px solid var(--red);color:var(--red);}
+.mbox .msol{background:rgba(76,175,80,.07);border:1px solid rgba(76,175,80,.22);border-radius:7px;padding:10px;font-size:.84rem;}
+.mbox .msol strong{display:block;margin-bottom:4px;color:var(--green);}
+#mmenu{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:300;padding:20px;}
+#mmenu.show{display:flex;}
+.mmbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;
+  max-width:440px;width:100%;max-height:85vh;overflow-y:auto;}
+.mmbox h3{color:var(--accent);margin-bottom:5px;font-size:1rem;text-align:center;}
+.mmbox p{color:var(--muted);font-size:.78rem;text-align:center;margin-bottom:14px;}
+.mm-opts{display:flex;flex-direction:column;gap:7px;}
+.mm-opt{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 13px;
+  cursor:pointer;transition:.15s;display:flex;justify-content:space-between;align-items:center;}
+.mm-opt:hover{border-color:var(--accent);}
+.mm-opt .mn{font-size:.82rem;font-weight:600;}
+.mm-opt .mr{font-size:.72rem;color:var(--muted);}
+.mm-sep{height:1px;background:var(--border);margin:4px 0;}
+</style>
+</head>
+<body>
+
+<div id="inicio" class="pantalla activa">
+  <div class="logo">
+    <h1>📝 Módulo A — SPEN 2026</h1>
+    <div class="sub">Lenguaje y Comunicación · 60 reactivos · Versión 2</div>
+    <div class="badge">✅ Distribución verificada: A=19 · B=20 · C=21</div>
+  </div>
+  <div id="banner-prog">
+    <h3>📌 Progreso guardado</h3>
+    <p id="ban-txt"></p>
+    <div class="row">
+      <button class="btn btn-p" onclick="continuarGuardado()">Continuar donde me quedé →</button>
+      <button class="btn btn-d" onclick="pedirReinicio()">Empezar de nuevo</button>
+    </div>
+  </div>
+  <div class="sel-wrap">
+    <h2>Elige un bloque o realiza el examen completo</h2>
+    <div class="bloques-grid" id="bloques-grid"></div>
+    <button class="btn-todos sel" id="btn-todos" onclick="selBloque('todos')">
+      📋 Examen completo — los 10 bloques en orden (60 reactivos)
+    </button>
+  </div>
+  <div class="info-l">
+    <div>✅ Corrección inmediata al seleccionar respuesta + justificación</div>
+    <div>↩ Puedes revisar preguntas anteriores (sin cambiar respuesta)</div>
+    <div>⚠️ Los textos de lectura desaparecen al cambiar de bloque — igual que el CENEVAL real</div>
+    <div>💾 Progreso guardado automáticamente · Sin cronómetro</div>
+  </div>
+  <button class="btn btn-p" id="btn-com" onclick="comenzar()" style="font-size:1rem;padding:13px 34px;">
+    COMENZAR EXAMEN COMPLETO →
+  </button>
+</div>
+
+<div id="examen" class="pantalla">
+  <div class="hdr">
+    <button class="btn-mh" onclick="abrirMM()">☰ Menú</button>
+    <span class="hpi" id="hpi">1 / 60</span>
+    <div class="pbw"><div class="pb" id="pb" style="width:0%"></div></div>
+    <span class="hblq" id="hblq">Texto 1</span>
+    <span class="sv" id="sv">✓ guardado</span>
+  </div>
+  <div id="navlat"></div>
+  <div class="ebody" id="cuerpo"></div>
+</div>
+
+<div id="resultados" class="pantalla">
+  <div class="rhead">
+    <h2>📊 Resultados — Módulo A · Lenguaje v2</h2>
+    <div class="calg" id="calg">—</div>
+    <div class="rsub" id="rsub"></div>
+  </div>
+  <div class="bres-wrap" id="bres-wrap"></div>
+  <div class="acres">
+    <button class="btn btn-s" onclick="irInicio()">← Menú principal</button>
+    <button class="btn btn-p" onclick="dlCSV()">⬇ CSV</button>
+    <button class="btn btn-p" onclick="dlTXT()">⬇ TXT</button>
+  </div>
+  <div class="twrap2">
+    <table>
+      <thead><tr><th>#</th><th>Bloque</th><th class="tdp">Pregunta</th><th>Tu resp.</th><th>Correcta</th><th>Estado</th><th>Ver</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="movlay" onclick="cerrarMod(event)">
+  <div class="mbox">
+    <h3 id="mt"></h3>
+    <div class="menum" id="me"></div>
+    <div class="mresp" id="mr"></div>
+    <div class="msol" id="msol"></div>
+    <div style="margin-top:14px"><button class="btn btn-s" onclick="cerrarMod()">Cerrar</button></div>
+  </div>
+</div>
+
+<div id="mmenu" onclick="cerrarMM(event)">
+  <div class="mmbox">
+    <h3>☰ Menú</h3>
+    <p>El progreso se guarda automáticamente.</p>
+    <div class="mm-opts" id="mm-opts"></div>
+    <div style="margin-top:12px;text-align:center">
+      <button class="btn btn-s" onclick="cerrarMM()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const RX=[{"n": 1, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "¿Cuál es la idea principal que desarrolla el texto?", "opts": {"a": "La memoria opera como un proceso reconstructivo y dinámico, con implicaciones en la cognición y en el sistema jurídico.", "b": "La memoria es un mecanismo deficiente que distorsiona los recuerdos por causas emocionales.", "c": "Los experimentos de Loftus demostraron que la memoria puede ser manipulada mediante sugestión."}, "r": "a"}, {"n": 2, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "Según el texto, la «plasticidad» de la memoria cumple una función:", "opts": {"a": "Negativa, pues compromete la fidelidad de los recuerdos en situaciones de presión.", "b": "Estética, ya que enriquece los recuerdos con detalles emocionales que los hacen más vívidos.", "c": "Adaptativa, porque permite actualizar el conocimiento y ajustar las predicciones sobre el entorno."}, "r": "c"}, {"n": 3, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "A partir del texto, los experimentos de Loftus con las palabras «chocaron» vs. «se tocaron» buscaban demostrar que:", "opts": {"a": "los testigos son deliberadamente imprecisos cuando se les interroga bajo presión.", "b": "la velocidad percibida de un evento depende exclusivamente del estado emocional del observador.", "c": "una variación mínima en la formulación de una pregunta puede modificar la reconstrucción del recuerdo."}, "r": "c"}, {"n": 4, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "¿Qué relación establece el cuarto párrafo con el argumento central del texto?", "opts": {"a": "Introduce una excepción al señalar que las memorias falsas sólo se generan bajo trauma.", "b": "Amplía el argumento al mostrar que las memorias falsas pueden surgir incluso sin presión ni trauma externo.", "c": "Refuta los experimentos de Loftus al demostrar que la repetición no es suficiente para generar recuerdos falsos."}, "r": "b"}, {"n": 5, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "La expresión «prueba reina» (tercer párrafo) puede sustituirse sin alterar el sentido por:", "opts": {"a": "evidencia privilegiada", "b": "indicio preliminar", "c": "registro objetivo"}, "r": "a"}, {"n": 6, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "¿Cuál de las siguientes afirmaciones es INCOMPATIBLE con la información del texto?", "opts": {"a": "Un testigo que confía plenamente en su recuerdo puede describir un evento que no ocurrió exactamente como lo narra.", "b": "El hipocampo actúa como indexador que vincula componentes del recuerdo durante su consolidación.", "c": "El conocimiento previo de que una información es falsa elimina completamente el efecto de ilusión de la verdad."}, "r": "c"}, {"n": 7, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "El término «traza mnémica» (último párrafo) hace referencia a:", "opts": {"a": "la huella o registro que deja un recuerdo en el sistema nervioso.", "b": "la ruta neurológica que sigue el impulso eléctrico durante la formación del recuerdo.", "c": "el conjunto de estrategias cognitivas que emplea el cerebro para organizar la memoria."}, "r": "a"}, {"n": 8, "b": "Texto 1 — Artículo científico", "t": "T1", "e": "El tono predominante del texto es:", "opts": {"a": "divulgativo-descriptivo, pues sólo describe experimentos sin comprometerse con ninguna postura.", "b": "expositivo-argumentativo, ya que presenta y sustenta una tesis sobre el funcionamiento reconstructivo de la memoria.", "c": "poético-reflexivo, porque apela a las emociones del lector para cuestionar la objetividad de la ciencia."}, "r": "b"}, {"n": 9, "b": "Texto 2 — Crónica periodística", "t": "T2", "e": "¿Cuál es el propósito comunicativo principal de este texto?", "opts": {"a": "Persuadir al lector para que se sume a la demanda de acceso al agua como derecho constitucional.", "b": "Informar sobre los procedimientos legales para reconocer un derecho constitucional en la Ciudad.", "c": "Narrar con perspectiva crítica los hechos de una vigilia ciudadana y el contexto sociopolítico que la rodea."}, "r": "c"}, {"n": 10, "b": "Texto 2 — Crónica periodística", "t": "T2", "e": "La expresión «con la prisa característica de quien no quiere que lo fotografíen» (tercer párrafo) revela, por parte del cronista:", "opts": {"a": "una actitud de crítica implícita hacia la gestión institucional del funcionario.", "b": "una descripción objetiva del protocolo de recepción de documentos oficiales.", "c": "un elogio velado a la discreción con que operan los funcionarios de gobierno."}, "r": "a"}, {"n": 11, "b": "Texto 2 — Crónica periodística", "t": "T2", "e": "El cronista inicia el texto describiendo el amanecer y el estado del Zócalo. Esta elección narrativa:", "opts": {"a": "resta objetividad al texto, pues privilegia los elementos descriptivos sobre los informativos.", "b": "introduce al lector en el contexto físico y atmosférico antes del conflicto central, creando una ambientación que anticipa el tono de los hechos.", "c": "distrae al lector de la información central para generar suspenso sobre el conflicto que se abordará."}, "r": "b"}, {"n": 12, "b": "Texto 2 — Crónica periodística", "t": "T2", "e": "¿Qué función cumple la cita directa de Doña Remedios Cárdenas en el segundo párrafo?", "opts": {"a": "Validar jurídicamente la exigencia de la Unión de Colonias ante la Secretaría de Gobierno.", "b": "Otorgar voz a una participante y humanizar la causa que la movilización representa.", "c": "Demostrar que la manifestación contó con amplio apoyo de personas adultas mayores."}, "r": "b"}, {"n": 13, "b": "Texto 2 — Crónica periodística", "t": "T2", "e": "La frase final —«con esa indiferencia monumental que tienen las plazas grandes cuando los que las ocuparon se han ido»— puede interpretarse como:", "opts": {"a": "un recurso de personificación que atribuye indiferencia a la plaza para simbolizar la falta de respuesta del poder.", "b": "una descripción literal de las dimensiones físicas del Zócalo incorporada como dato arquitectónico.", "c": "una crítica directa a los manifestantes por abandonar el espacio público sin lograr su objetivo."}, "r": "a"}, {"n": 14, "b": "Texto 2 — Crónica periodística", "t": "T2", "e": "¿Cuál de las siguientes opciones describe mejor la postura del cronista ante los hechos narrados?", "opts": {"a": "Simpatía abierta con el movimiento: el cronista abandona la imparcialidad para sumarse a la causa.", "b": "Distanciamiento irónico que, sin tomar partido explícito, evidencia las contradicciones entre la demanda ciudadana y la respuesta institucional.", "c": "Neutralidad absoluta: el cronista se limita a registrar los hechos sin ningún recurso valorativo."}, "r": "b"}, {"n": 15, "b": "Texto 2 — Crónica periodística", "t": "T2", "e": "El antónimo contextual más preciso de «disolvió» (último párrafo), en el sentido en que se usa en el texto, es:", "opts": {"a": "concentró", "b": "fragmentó", "c": "condensó"}, "r": "a"}, {"n": 16, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "El «luto mecánico» mencionado en el primer párrafo es una figura literaria que consiste en:", "opts": {"a": "Una hipérbole que exagera el dolor de la familia para enfatizar la profundidad del duelo.", "b": "Una personificación que convierte al reloj en un personaje que padece la pérdida del abuelo.", "c": "Una metáfora que atribuye a la inmovilidad del reloj el carácter de duelo silencioso y colectivo."}, "r": "c"}, {"n": 17, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "La frase «con que se mira a quien ya no puede decepcionarte porque ya no puede hacer nada» expresa:", "opts": {"a": "Una crítica de Marina hacia el abuelo fallecido, a quien recuerda con resentimiento.", "b": "La indiferencia total de Marina ante la muerte del abuelo y los objetos que la evocan.", "c": "Una ternura resignada hacia algo —o alguien— cuya inmovilidad lo ha vuelto inofensivo e inmodificable."}, "r": "c"}, {"n": 18, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "El tipo de narrador empleado en el texto es:", "opts": {"a": "Narrador testigo en segunda persona, que interpela directamente al lector para generar complicidad.", "b": "Narrador omnisciente en tercera persona, que accede a los pensamientos de Marina y los comenta.", "c": "Narrador protagonista en primera persona que relata su propia experiencia interior."}, "r": "b"}, {"n": 19, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "La explicación del técnico al final del cuento cumple la función de:", "opts": {"a": "Revelar la causa sobrenatural del movimiento del reloj, confirmando los miedos de Marina.", "b": "Introducir un nuevo conflicto al sugerir que alguien había manipulado el reloj intencionalmente.", "c": "Ofrecer una explicación racional que contrasta con la interpretación inquietante que Marina construyó durante el día."}, "r": "c"}, {"n": 20, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "«Se le ocurrió dar un paso antes de morir» (último párrafo) es un ejemplo de:", "opts": {"a": "Aliteración, porque repite sonidos consonánticos para crear un efecto fónico expresivo.", "b": "Personificación, porque atribuye voluntad e intención a la pila del reloj.", "c": "Elipsis, porque omite el sujeto explícito de la oración para crear ambigüedad."}, "r": "b"}, {"n": 21, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "¿Cuál describe mejor el tono del relato?", "opts": {"a": "Terrorífico y sobrenatural: acumula tensión sostenida para generar miedo genuino.", "b": "Melancólico y sentimental: su objetivo es conmover con la historia de duelo familiar.", "c": "Inquietante y levemente irónico: crea una atmósfera de extrañeza que se disuelve con humor sutil al final."}, "r": "c"}, {"n": 22, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "En el contexto del texto, el antónimo más preciso de «parálisis» (segundo párrafo) es:", "opts": {"a": "quietud", "b": "movimiento", "c": "rigidez"}, "r": "b"}, {"n": 23, "b": "Texto 3 — Narrativa literaria", "t": "T3", "e": "¿Cuál de las siguientes opciones representa una inferencia válida a partir del texto?", "opts": {"a": "La madre prefiere una explicación razonable antes que indagar en la causa real del movimiento del reloj.", "b": "La familia dejó de dar cuerda al reloj como señal de que había superado el duelo por el abuelo.", "c": "El técnico conocía de antemano el estado del reloj porque había visitado la casa anteriormente."}, "r": "a"}, {"n": 24, "b": "Texto 4 — Ensayo", "t": "T4", "e": "La tesis central del ensayo puede formularse como:", "opts": {"a": "La tecnología digital debe ser regulada por los gobiernos para proteger la calidad del pensamiento ciudadano.", "b": "La aceleración informativa de la era digital amenaza la capacidad de pensamiento crítico y, por extensión, la deliberación democrática.", "c": "La globalización cultural ha uniformado los sistemas de pensamiento, eliminando la diversidad epistémica."}, "r": "b"}, {"n": 25, "b": "Texto 4 — Ensayo", "t": "T4", "e": "¿Qué función argumentativa cumple el tercer párrafo dentro del ensayo?", "opts": {"a": "Refuta completamente la tesis inicial al demostrar que la tecnología ha beneficiado más de lo que ha perjudicado.", "b": "Presenta evidencia empírica que respalda la hipótesis de la «ilusión de comprensión» con datos estadísticos.", "c": "Introduce una concesión: el autor reconoce los avances del acceso digital antes de retomar su argumento crítico."}, "r": "c"}, {"n": 26, "b": "Texto 4 — Ensayo", "t": "T4", "e": "La expresión «pensamiento lento» (último párrafo) contrasta, dentro del texto, con:", "opts": {"a": "la lógica del scroll infinito y la aceleración social que impiden la reflexión profunda.", "b": "la democratización del acceso a la información que permite consultar textos complejos.", "c": "las conferencias magistrales universitarias que exigen atención sostenida."}, "r": "a"}, {"n": 27, "b": "Texto 4 — Ensayo", "t": "T4", "e": "El término «epistemológicas» (segundo párrafo) se refiere a consecuencias relacionadas con:", "opts": {"a": "los efectos neurológicos medibles que produce la exposición prolongada a pantallas.", "b": "la forma en que los sujetos construyen, validan y procesan el conocimiento.", "c": "la economía del conocimiento y la distribución inequitativa de la información digital."}, "r": "b"}, {"n": 28, "b": "Texto 4 — Ensayo", "t": "T4", "e": "¿Cuál de las siguientes afirmaciones refleja correctamente la postura del autor sobre la tecnología?", "opts": {"a": "El autor adopta una postura de rechazo total y propone limitar el acceso a internet.", "b": "El autor considera que la tecnología es neutral y que los problemas provienen de las plataformas.", "c": "El autor reconoce los beneficios del acceso digital pero cuestiona la ausencia de estructuras cognitivas para procesarlo críticamente."}, "r": "c"}, {"n": 29, "b": "Texto 4 — Ensayo", "t": "T4", "e": "«El que duda, el que coteja, el que se permite llegar tarde a una conclusión» es un ejemplo de:", "opts": {"a": "Anáfora, porque repite la estructura «el que» para enumerar las características del pensamiento que el autor defiende.", "b": "Hipérbole, porque exagera las virtudes del pensamiento pausado para persuadir al lector.", "c": "Metonimia, porque sustituye el concepto «pensamiento crítico» por las acciones que lo definen."}, "r": "a"}, {"n": 30, "b": "Texto 4 — Ensayo", "t": "T4", "e": "La «ilusión de comprensión» descrita en el segundo párrafo es análoga a:", "opts": {"a": "Estudiar un tema con profundidad durante semanas y llegar a una conclusión provisional.", "b": "Consultar múltiples fuentes sobre un mismo tema antes de formarse un juicio propio.", "c": "Creer que se ha leído un libro completo porque se revisó su índice y sus conclusiones."}, "r": "c"}, {"n": 31, "b": "Texto 4 — Ensayo", "t": "T4", "e": "¿Qué relación lógica introduce la frase «No se trata, sin embargo» al inicio del tercer párrafo?", "opts": {"a": "Establece una consecuencia del argumento presentado en el párrafo anterior.", "b": "Anticipa una objeción posible y matiza el argumento para evitar una interpretación extrema.", "c": "Introduce una causa que explica por qué el argumento previo es correcto."}, "r": "b"}, {"n": 32, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "¿Cuál es la diferencia que el texto establece entre paridad formal y paridad sustantiva?", "opts": {"a": "La formal garantiza la presencia numérica de mujeres en los cargos; la sustantiva implica que esa presencia se traduzca en ejercicio real del poder.", "b": "La paridad formal se aplica en los municipios y la sustantiva en el ámbito federal, según el orden de gobierno.", "c": "La paridad formal fue establecida en 2014 y la sustantiva surgió exclusivamente con la reforma de 2019."}, "r": "a"}, {"n": 33, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "El primer párrafo argumenta que la subrepresentación femenina en el Legislativo era resultado de:", "opts": {"a": "Una decisión deliberada de los partidos para excluir a las mujeres de sus procesos internos.", "b": "La falta de interés de las mujeres en participar como candidatas legislativas.", "c": "Una estructura de poder que se autoperpetúa al reproducir las condiciones que generan la propia exclusión."}, "r": "c"}, {"n": 34, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "¿Qué son las «candidaturas testimoniales» según el tercer párrafo?", "opts": {"a": "Candidaturas de mujeres electas como legisladoras que no ejercen activamente sus funciones.", "b": "Postulaciones realizadas para cumplir formalmente el requisito de paridad, sin otorgar recursos ni apoyo real a las candidatas.", "c": "Candidaturas avaladas por el TEPJF como mecanismo de sanción a partidos que incumplen la paridad."}, "r": "b"}, {"n": 35, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "El conector «Con todo» al inicio de la última oración del cuarto párrafo introduce:", "opts": {"a": "Una objeción o matiz que reconoce los límites de la reforma constitucional aprobada en 2019.", "b": "Una conclusión que sintetiza los avances logrados por la reforma de paridad total.", "c": "Una aclaración que refuerza el argumento favorable a la extensión de la paridad a todos los poderes."}, "r": "a"}, {"n": 36, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "¿Cuál de las siguientes opciones resume con mayor precisión la tesis del texto?", "opts": {"a": "La reforma de 2014 fue insuficiente porque sólo estableció paridad en candidaturas legislativas.", "b": "La paridad en la representación política requiere avanzar de la presencia numérica formal hacia el ejercicio efectivo del poder por parte de las mujeres.", "c": "El TEPJF ha sido el principal actor en la construcción de la democracia paritaria en México."}, "r": "b"}, {"n": 37, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "La expresión «piso mínimo del diseño institucional democrático» (cuarto párrafo) implica que la paridad total:", "opts": {"a": "Se convirtió en un estándar básico e irrenunciable del sistema político, no en una meta excepcional.", "b": "Es un objetivo aspiracional que aún no ha sido alcanzado plenamente por ningún orden de gobierno.", "c": "Establece el límite máximo de participación femenina que los partidos pueden garantizar voluntariamente."}, "r": "a"}, {"n": 38, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "La estructura argumentativa del texto puede describirse como:", "opts": {"a": "Narrativa: cuenta cronológicamente los eventos que dieron lugar a la paridad sin emitir juicios valorativos.", "b": "Deductiva: parte de una tesis general sobre representación democrática y la desarrolla con casos específicos de legislación mexicana.", "c": "Descriptiva: enumera las características de cada tipo de paridad sin establecer relaciones causales."}, "r": "b"}, {"n": 39, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "En el último párrafo, el término «descriptiva» (representación descriptiva) se opone a:", "opts": {"a": "normativa, porque la representación sustantiva responde a una norma jurídica y no a un criterio numérico.", "b": "proporcional, porque el texto distingue entre sistemas de mayoría relativa y representación proporcional.", "c": "sustantiva, porque la mera presencia numérica no equivale a la incorporación efectiva de perspectivas e intereses."}, "r": "c"}, {"n": 40, "b": "Texto 5 — Texto electoral y cívico", "t": "T5", "e": "¿Cuál de las siguientes inferencias es compatible con la información del texto?", "opts": {"a": "Un partido puede cumplir formalmente con la paridad y aun así obstaculizar la representación real de las mujeres.", "b": "La reforma de 2019 eliminó completamente las candidaturas testimoniales al extender la paridad a todos los poderes.", "c": "La jurisprudencia del TEPJF fue el factor determinante para que la reforma de 2019 fuera aprobada."}, "r": "a"}, {"n": 41, "b": "Conectores lógicos", "t": null, "e": "Selecciona el conector que establece la relación lógica correcta:\n\n«El padrón electoral creció un 8% respecto al proceso anterior; ________, la infraestructura de casillas no fue ampliada de manera proporcional.»", "opts": {"a": "por consiguiente", "b": "no obstante", "c": "a saber"}, "r": "b"}, {"n": 42, "b": "Conectores lógicos", "t": null, "e": "¿Cuál es la secuencia de conectores que otorga mayor coherencia al párrafo?\n\n«La capacitación electoral es responsabilidad del INE ___(I)___ se trate de elecciones federales o locales. ___(II)___, los operadores locales deben coordinarse con las juntas distritales.»", "opts": {"a": "(I) en caso de que / (II) Además", "b": "(I) salvo que / (II) Por el contrario", "c": "(I) independientemente de que / (II) En consecuencia"}, "r": "c"}, {"n": 43, "b": "Conectores lógicos", "t": null, "e": "Identifica la opción que completa el texto con mayor cohesión y precisión lógica:\n\n«El acceso a la información pública es un derecho fundamental; ________, su ejercicio requiere procedimientos claros que garanticen su efectividad.»", "opts": {"a": "sin embargo", "b": "a pesar de ello", "c": "en consecuencia"}, "r": "c"}, {"n": 44, "b": "Figuras literarias", "t": null, "e": "«Sus ojos eran dos luceros apagados que ya no alumbraban ningún camino.» ¿Qué figura literaria predomina?", "opts": {"a": "Metáfora, porque establece una identificación entre los ojos y los luceros sin usar un término comparativo explícito como «como» o «tal como».", "b": "Hipérbole, porque exagera las dimensiones físicas de los ojos para enfatizar la pérdida de su brillo.", "c": "Sinestesia, porque mezcla la percepción visual con la sensación táctil del frío que evoca la oscuridad."}, "r": "a"}, {"n": 45, "b": "Figuras literarias", "t": null, "e": "«Tanto lloró aquella noche que sus lágrimas podrían haber llenado el océano.» La figura literaria presente es:", "opts": {"a": "Metonimia, porque sustituye el océano por las lágrimas al establecer una relación de contigüidad.", "b": "Hipérbole, porque exagera desproporcionadamente la cantidad de llanto para enfatizar la intensidad del dolor.", "c": "Personificación, porque atribuye a las lágrimas la capacidad activa de llenado."}, "r": "b"}, {"n": 46, "b": "Figuras literarias", "t": null, "e": "Identifica la figura literaria en el siguiente fragmento:\n\n«En el principio de la tarde tardía / tarde de tardes con sabor a arena.»", "opts": {"a": "Aliteración, porque la repetición de la sílaba «tar» crea un efecto fónico que refuerza el significado.", "b": "Hipérbaton, porque invierte el orden natural del adjetivo y el sustantivo para crear extrañamiento.", "c": "Elipsis, porque omite el verbo principal de la oración para concentrar el énfasis en los elementos nominales."}, "r": "a"}, {"n": 47, "b": "Figuras literarias", "t": null, "e": "«Leyó Cervantes a toda la clase.» Este enunciado ilustra la figura conocida como:", "opts": {"a": "Hipérbaton, porque en lugar de decir «leyó a Cervantes a toda la clase», se invierte el orden del objeto.", "b": "Elipsis, porque se omite el objeto directo de la acción de leer.", "c": "Metonimia, porque sustituye la obra de Cervantes por el nombre del autor: el creador representa a su creación."}, "r": "c"}, {"n": 48, "b": "Figuras literarias", "t": null, "e": "«Tardías mariposas de ceniza / vuelan hacia la luz que no existe.» ¿Cuál es la figura literaria que estructura estos versos?", "opts": {"a": "Símil, porque compara las mariposas con la ceniza mediante una relación de semejanza.", "b": "Hipérbole, porque exagera la cantidad de mariposas para crear una imagen de gran intensidad.", "c": "Paradoja, porque afirma simultáneamente que las mariposas se dirigen hacia algo que no existe, uniendo movimiento y vacío."}, "r": "c"}, {"n": 49, "b": "Voz activa y pasiva", "t": null, "e": "¿Cuál es la transformación correcta a voz pasiva de la siguiente oración?\n\n«El Consejo General aprobó el acuerdo por unanimidad.»", "opts": {"a": "El acuerdo aprobó por unanimidad al Consejo General.", "b": "El acuerdo fue aprobado por el Consejo General por unanimidad.", "c": "El Consejo General fue quien aprobó el acuerdo, que resultó unánime."}, "r": "b"}, {"n": 50, "b": "Voz activa y pasiva", "t": null, "e": "Identifica la oración que está en voz pasiva:", "opts": {"a": "Los funcionarios de casilla fueron capacitados por las juntas distritales.", "b": "Las juntas distritales capacitaron a los funcionarios de casilla.", "c": "Las juntas distritales completaron la capacitación de los funcionarios a tiempo."}, "r": "a"}, {"n": 51, "b": "Voz activa y pasiva", "t": null, "e": "¿En cuál de los siguientes casos el uso de la voz pasiva es más adecuado para un informe institucional formal, en términos de impersonalidad y precisión?", "opts": {"a": "Los supervisores revisaron todos los expedientes antes de la sesión plenaria.", "b": "Todos los expedientes fueron revisados antes de la sesión plenaria.", "c": "Antes de la sesión plenaria, los supervisores se encargaron de revisar los expedientes."}, "r": "b"}, {"n": 52, "b": "Ortografía y gramática", "t": null, "e": "¿En cuál de las siguientes opciones todas las palabras están escritas correctamente?", "opts": {"a": "preveer, adecuación, haber", "b": "prever, adecuasión, haber", "c": "prever, adecuación, haber"}, "r": "c"}, {"n": 53, "b": "Ortografía y gramática", "t": null, "e": "Selecciona la oración con uso correcto de la tilde según la RAE (Ortografía 2010):", "opts": {"a": "El juez dictó sentencia; solo él conocía los pormenores del caso.", "b": "El juéz dictó sentencia; sólo él conocía los pormenores del caso.", "c": "El juez dictó sentencia; sólo el conocía los pormenores del caso."}, "r": "a"}, {"n": 54, "b": "Ortografía y gramática", "t": null, "e": "¿Cuál es la opción en que la coma está usada correctamente según las reglas de puntuación?", "opts": {"a": "Las reformas electorales de 1977, 1996, y 2014, modificaron el sistema de partidos.", "b": "Las reformas electorales, de 1977 1996 y 2014, modificaron el sistema de partidos.", "c": "Las reformas electorales de 1977, 1996 y 2014 modificaron el sistema de partidos."}, "r": "c"}, {"n": 55, "b": "Ortografía y gramática", "t": null, "e": "Identifica la oración que contiene un error ortográfico:", "opts": {"a": "El funcionario se abstuvo de revelar información confidencial.", "b": "La revocasión de mandato fue aprobada como mecanismo de democracia directa.", "c": "El subrayado de los textos facilita la retención de conceptos clave."}, "r": "b"}, {"n": 56, "b": "Sinónimos, antónimos y léxico", "t": null, "e": "«La propuesta del concejal resultó ser muy austera en términos presupuestales.» El antónimo contextual más preciso de austera es:", "opts": {"a": "pródiga", "b": "económica", "c": "módica"}, "r": "a"}, {"n": 57, "b": "Sinónimos, antónimos y léxico", "t": null, "e": "«El té de la mañana llegó tibio a la mesa.» El antónimo más preciso de tibio en este contexto es:", "opts": {"a": "fresco", "b": "helado", "c": "ardiente"}, "r": "c"}, {"n": 58, "b": "Sinónimos, antónimos y léxico", "t": null, "e": "«El dictamen fue aprobado de forma unánime por el pleno.» El sinónimo contextualmente más adecuado de unánime es:", "opts": {"a": "singular", "b": "consensuado", "c": "mayoritario"}, "r": "b"}, {"n": 59, "b": "Sinónimos, antónimos y léxico", "t": null, "e": "¿Cuál es el antónimo de dilatar en el contexto de «el Consejo decidió dilatar la resolución hasta nuevo aviso»?", "opts": {"a": "agilizar", "b": "ampliar", "c": "expedir"}, "r": "a"}, {"n": 60, "b": "Sinónimos, antónimos y léxico", "t": null, "e": "Selecciona la oración redactada con mayor precisión y corrección para un documento institucional formal:", "opts": {"a": "Hicimos las gestiones para cumplir con los plazos que establece la convocatoria en tiempo y forma.", "b": "Las gestiones que se hicieron fueron para poder cumplir los plazos de la convocatoria.", "c": "Se realizaron las gestiones pertinentes a fin de dar cabal cumplimiento a los plazos establecidos en la convocatoria."}, "r": "c"}];
+const BLOQUES={"Texto 1 — Artículo científico": [1, 2, 3, 4, 5, 6, 7, 8], "Texto 2 — Crónica periodística": [9, 10, 11, 12, 13, 14, 15], "Texto 3 — Narrativa literaria": [16, 17, 18, 19, 20, 21, 22, 23], "Texto 4 — Ensayo": [24, 25, 26, 27, 28, 29, 30, 31], "Texto 5 — Texto electoral y cívico": [32, 33, 34, 35, 36, 37, 38, 39, 40], "Conectores lógicos": [41, 42, 43], "Figuras literarias": [44, 45, 46, 47, 48], "Voz activa y pasiva": [49, 50, 51], "Ortografía y gramática": [52, 53, 54, 55], "Sinónimos, antónimos y léxico": [56, 57, 58, 59, 60]};
+const TEXTOS={"T1": "La memoria no es un archivo estático que preserva fielmente los hechos del pasado; es, más bien, un proceso dinámico de reconstrucción. Cada vez que recordamos algo, no recuperamos un registro inmutable, sino que lo reescribimos en función del contexto actual, de nuestros estados emocionales y de la información incorporada desde entonces. Esta plasticidad, lejos de ser una falla del sistema cognitivo, cumple una función adaptativa: permite actualizar el conocimiento y ajustar las predicciones sobre el entorno.\n\nLos experimentos de Elizabeth Loftus en la década de 1970 demostraron que los recuerdos pueden ser modificados mediante sugestión externa. En sus estudios, bastaba con introducir una palabra distinta en una pregunta —«¿a qué velocidad iban los autos cuando chocaron?» versus «¿cuando se tocaron?»— para alterar la estimación que los participantes realizaban sobre el evento presenciado. La memoria, concluía Loftus, es fundamentalmente reconstructiva y, por tanto, susceptible de contaminación.\n\nEsta vulnerabilidad tiene implicaciones profundas en el sistema de justicia. Los testimonios oculares, durante décadas considerados la prueba reina de los procesos penales, han sido cuestionados con rigor creciente. Estudios del Innocence Project revelaron que más del 70% de las condenas revisadas y exoneradas por evidencia genética se habían basado, en alguna medida, en identificaciones erróneas de testigos. La confianza subjetiva del testigo en su recuerdo no guarda correlación confiable con la precisión objetiva del mismo.\n\nEl fenómeno de la «memoria falsa» no se limita a situaciones de presión o trauma. Pueden generarse recuerdos vívidos de eventos que nunca ocurrieron mediante técnicas tan simples como la imaginación guiada o la repetición de información falsa con suficiente frecuencia. Este efecto, denominado «ilusión de la verdad», opera incluso cuando el sujeto conoce de antemano que la información es incorrecta, aunque su eficacia se reduce considerablemente en ese caso.\n\nLos avances en neuroimagen funcional han permitido identificar los sustratos cerebrales de este proceso. La consolidación de la memoria depende del hipocampo, que actúa como un indexador que vincula componentes del recuerdo distribuidos en la corteza. Sin embargo, cada acto de recuperación desestabiliza temporalmente la traza mnémica, abriéndola a modificaciones antes de su reconsolidación. Es en esta ventana de vulnerabilidad donde las interferencias externas resultan más eficaces.", "T2": "El martes amaneció gris sobre el Zócalo. A las seis de la mañana, cuando los operativos de limpia aún barrían los últimos vestigios del mitin del día anterior, los primeros contingentes comenzaron a desembocar desde el Metro Pino Suárez. Venían de Iztapalapa, de Xochimilco, de Milpa Alta; traían pancartas hechas a mano, termo de café y la convicción de quienes saben que el trámite que los ha traído lleva dieciocho meses sin resolverse.\n\nNo era una marcha ordinaria. Era una vigilia cívica, como la llamaron sus organizadores, convocada por la Unión de Colonias en Defensa del Agua para exigir que el Congreso local aprobara el dictamen que reconoce el acceso al agua como derecho constitucional en la Ciudad. «Venimos a recordarle al gobierno que existimos», dijo Doña Remedios Cárdenas, de 68 años, sentada sobre un petate frente a la Catedral, con la serenidad de quien ya ha visto muchas promesas disueltas en el smog capitalino.\n\nLa representante del colectivo, la licenciada Fernanda Ocampo, entregó a las 10:15 horas un pliego petitorio de siete puntos a un funcionario de la Secretaría de Gobierno, quien acusó recibo con la prisa característica de quien no quiere que lo fotografíen. El documento exigía, entre otras cosas, la creación de un Consejo Ciudadano de Vigilancia Hídrica, la publicación de los contratos con empresas concesionarias y la cancelación de las tarifas diferenciadas que, según los manifestantes, castigan desproporcionalmente a las alcaldías periféricas.\n\nA mediodía, el sol rompió las nubes y con él llegó también la tensión. Un grupo de jóvenes intentó bloquear el tránsito sobre Correo Mayor, pero fue disuadido por los propios organizadores, conscientes de que cualquier desbordamiento daría argumentos a quienes buscan desacreditar la movilización. «Nuestra fuerza está en la disciplina», repitió Ocampo por el micrófono, con una firmeza que resonó más que cualquier consigna.\n\nAl caer la tarde, sin respuesta oficial más allá del acuse de recibo, la vigilia se disolvió en el mismo orden con que había llegado. Los contingentes regresaron a sus alcaldías con las pancartas dobladas y la certeza incómoda de que volverán. El Zócalo quedó vacío otra vez, con esa indiferencia monumental que tienen las plazas grandes cuando los que las ocuparon se han ido.", "T3": "El reloj de pared llevaba tres años marcando las once y cuarto. Nadie lo había vuelto a tocar desde que murió el abuelo, y su inmovilidad se había convertido en una especie de luto mecánico que todos en la casa aceptaban sin discutirlo. Marina lo miraba cada mañana desde el umbral de la cocina con la misma mezcla de fastidio y ternura con que se mira a quien ya no puede decepcionarte porque ya no puede hacer nada.\n\nEsa mañana, sin embargo, el reloj marcaba las once y dieciséis. Marina lo observó durante un minuto entero, como si esperara que el error se corrigiera solo. No lo hizo. El minutero seguía apuntando sin vacilación hacia la misma aberración de un minuto que lo separaba de su parálisis habitual.\n\n—Mamá —llamó Marina—, el reloj se movió.\n\nSu madre apareció en el pasillo secándose las manos en el delantal y miró el artilugio con la expresión con que se miran las cosas que no deberían suceder y suceden de todas formas.\n\n—Habrá sido el temblor de anoche —dijo al fin, como si eso cerrara el asunto.\n\nPero Marina sabía que no había habido temblor. Había dormido mal, con esa lucidez nerviosa que a veces se instala en las madrugadas, y no había sentido nada. El reloj había decidido moverse por sí mismo, o lo que es peor, algo había decidido moverlo. Y eso, pensó Marina mientras ponía agua a hervir, era exactamente el tipo de cosa que una preferiría no saber.\n\nEsa tarde, cuando el técnico vino a revisar la instalación eléctrica, se detuvo frente al reloj y lo examinó con una linterna.\n\n—¿Cuánto tiempo lleva sin funcionar? —preguntó.\n—Tres años —respondió la madre.\n\nEl técnico asintió con la calma de quien está acostumbrado a que las casas guarden secretos que sus habitantes prefieren no investigar.\n\n—La pila —dijo sencillamente—. Queda tantita. Se le ocurrió dar un paso antes de morir.", "T4": "La velocidad con que circula la información en la era digital ha reconfigurado no sólo nuestros hábitos de consumo cultural, sino también los procesos mediante los cuales formamos opinión. El sociólogo alemán Hartmut Rosa ha denominado «aceleración social» a este fenómeno: la sensación de que el tiempo disponible se contrae en proporción inversa al aumento de las opciones y los estímulos. Vivimos, según Rosa, en una sociedad donde todo debe ser instantáneo, incluida la comprensión de los asuntos más complejos.\n\nEste régimen de velocidad tiene consecuencias epistemológicas concretas. La exposición continua a titulares, fragmentos y síntesis algorítmicas produce lo que algunos investigadores llaman «ilusión de comprensión»: la sensación de haber entendido un fenómeno cuando, en realidad, sólo se ha procesado su representación más superficial. El pensamiento crítico requiere detenimiento, revisión, contradicción interna; ninguna de estas operaciones es compatible con la lógica del scroll infinito.\n\nNo se trata, sin embargo, de una nostalgia tecnofóbica. La democratización del acceso a la información constituye un avance civilizatorio sin precedentes: por primera vez en la historia, cualquier persona con conexión puede leer a Hegel, consultar un artículo de Nature o escuchar una conferencia magistral de una universidad de élite. El problema no radica en la abundancia, sino en la ausencia de estructuras cognitivas que permitan procesar esa abundancia de manera significativa.\n\nLo que está en juego, en última instancia, es la calidad del juicio público. Las democracias contemporáneas descansan sobre el supuesto de que los ciudadanos son capaces de evaluar opciones políticas con cierto grado de racionalidad. Si la aceleración social erosiona sistemáticamente la capacidad de atención sostenida —condición necesaria para ese juicio—, entonces no sólo está cambiando la forma en que pensamos, sino también la viabilidad de la deliberación democrática tal como la hemos conocido.\n\nLa pregunta que deberíamos hacernos no es si debemos usar menos tecnología, sino cómo reconstruir, en medio de ella, las condiciones para el pensamiento lento: el que duda, el que coteja, el que se permite llegar tarde a una conclusión.", "T5": "La paridad de género en las candidaturas electorales no es un asunto de cuotas ni de corrección política: es una cuestión de representación democrática. Durante décadas, las mujeres constituyeron más de la mitad del padrón electoral mexicano y, sin embargo, ocupaban menos del 15% de los escaños legislativos. La brecha entre la presencia electoral femenina como votantes y su representación como legisladoras no era una anomalía estadística: era el reflejo de una estructura de poder que reproducía su propia exclusión.\n\nLa reforma constitucional de 2014, que dio origen al Instituto Nacional Electoral, incorporó el principio de paridad horizontal y vertical en la postulación de candidaturas. La paridad vertical exige que en listas plurinominales se alternen candidaturas de distinto género; la horizontal, que en los cargos de mayoría relativa se postulen tantas mujeres como hombres en el conjunto de los distritos o municipios. Sin embargo, la eficacia de esta norma dependía en gran medida de que los partidos no colocaran sistemáticamente a las candidatas en los distritos con menor posibilidad de triunfo.\n\nEl Tribunal Electoral del Poder Judicial de la Federación fue consolidando, a través de su jurisprudencia, criterios para detectar y sancionar las llamadas «candidaturas testimoniales»: aquellas postuladas únicamente para cumplir formalmente con la paridad, sin otorgarles recursos de campaña ni respaldo institucional. La distinción entre cumplir la norma y hacer efectivo su espíritu resultó ser el verdadero campo de disputa.\n\nEn 2019, la reforma constitucional en materia de paridad total extendió el principio a los tres poderes y a todos los órdenes de gobierno: ejecutivo, legislativo y judicial, federal, estatal y municipal. La norma dejó de ser una excepción y se convirtió en el piso mínimo del diseño institucional democrático. Con todo, los estudios posteriores han señalado que la paridad formal no garantiza la paridad sustantiva: ocupar un cargo no equivale a ejercer poder real cuando persisten las estructuras informales que limitan la autonomía política de las mujeres en sus propios partidos.\n\nLa democracia paritaria, en suma, no se agota en la representación descriptiva —cuántas mujeres están— sino que aspira a la representación sustantiva: en qué medida las decisiones públicas incorporan los intereses, las perspectivas y las prioridades de la mitad de la población que históricamente ha sido excluida de ellas."};
+const TLABELS={"T1": "Texto 1 — Artículo científico · Preguntas 1–8", "T2": "Texto 2 — Crónica periodística · Preguntas 9–15", "T3": "Texto 3 — Narrativa literaria · Preguntas 16–23", "T4": "Texto 4 — Ensayo · Preguntas 24–31", "T5": "Texto 5 — Texto electoral y cívico · Preguntas 32–40"};
+const JUST={"1": "La idea principal integra el carácter reconstructivo de la memoria con sus implicaciones cognitivas y jurídicas. B reduce el texto a causas emocionales; C reduce solo al experimento de Loftus.", "2": "El texto dice explícitamente que la plasticidad 'cumple una función adaptativa'. A la llama negativa; B inventa una función estética ausente en el texto.", "3": "El experimento manipulaba el verbo de la pregunta para mostrar que el lenguaje modifica el recuerdo. A y B introducen elementos ajenos al experimento (presión deliberada / estado emocional).", "4": "El cuarto párrafo amplía el argumento al mostrar que las memorias falsas surgen incluso sin trauma. A contradice el texto; C invierte la relación con los experimentos de Loftus.", "5": "'Prueba reina' = evidencia más valorada, privilegiada. 'Indicio preliminar' (B) y 'registro objetivo' (C) alteran el significado al introducir connotaciones distintas.", "6": "El texto dice que el conocimiento previo de la falsedad 'reduce considerablemente' el efecto, NO lo elimina. La opción C afirma que lo elimina completamente → INCOMPATIBLE con el texto.", "7": "'Traza mnémica' = la huella o registro que deja el recuerdo en el sistema nervioso (A). B describe la ruta eléctrica del impulso; C describe estrategias cognitivas.", "8": "El texto combina exposición y argumentación para sostener una tesis sobre la memoria reconstructiva → expositivo-argumentativo (B). A niega que haya postura del autor; C atribuye tono poético incorrecto.", "9": "La crónica narra con perspectiva crítica los hechos y el contexto sociopolítico (C). A confunde propósito narrativo con intención persuasiva; B reduce el texto a lo procedimental.", "10": "La frase revela ironía crítica implícita del cronista hacia el funcionario (A). B invierte el sentido al atribuir objetividad; C es absurda en contexto.", "11": "La descripción del amanecer contextualiza físicamente el escenario antes del conflicto central (B). A juzga negativamente sin fundamento; C atribuye 'suspenso' que no corresponde al género crónica.", "12": "La cita da voz a una participante y humaniza la causa que la movilización representa (B). A introduce un elemento jurídico ajeno; C es una inferencia sesgada.", "13": "La plaza 'indiferente' es una personificación que simboliza la falta de respuesta del poder (A). B la interpreta literalmente; C invierte la crítica hacia los manifestantes.", "14": "El cronista evidencia las contradicciones mediante recursos valorativos sin tomar partido explícito (B). A exagera la simpatía; C es falso porque hay recursos valorativos claros en el texto.", "15": "'Disolvió' en este contexto significa dispersarse. Su antónimo más preciso es 'concentró' (A). 'Fragmentó' (B) implica dispersión violenta; 'condensó' (C) es casi sinónimo de disolvió.", "16": "'Luto mecánico' = identificación implícita de la inmovilidad con un estado de duelo → metáfora (C). Hipérbole (A) exagera; personificación (B) atribuiría al reloj sentimientos propios activos.", "17": "La frase expresa una ternura resignada hacia algo cuya inmovilidad lo ha vuelto inofensivo (C). A introduce resentimiento ausente en el texto; B atribuye indiferencia total que tampoco está.", "18": "El narrador está en tercera persona y accede a los pensamientos de Marina → omnisciente (B). A inventa segunda persona; C sería primera persona protagonista.", "19": "La explicación del técnico ofrece la causa racional (la pila) que desmonta la interpretación inquietante de Marina (C). A es lo opuesto al texto; B es una inferencia sin fundamento textual.", "20": "'Se le ocurrió dar un paso' atribuye voluntad e intención a la pila → personificación (B). Aliteración (A) repite sonidos; elipsis (C) omite elementos sintácticos.", "21": "El tono combina inquietud con ironía sutil que se disuelve en la explicación final del técnico (C). A exagera el horror sobrenatural; B desenfoca hacia el sentimentalismo.", "22": "El antónimo de 'parálisis' en contexto es 'movimiento' (B). Quietud (A) y rigidez (C) son sinónimos o variantes de parálisis.", "23": "La madre acepta la explicación del temblor sin indagar en la causa real → inferencia válida (A). B invierte la causa del duelo; C no tiene ningún sustento textual.", "24": "La tesis integra aceleración informativa + amenaza al pensamiento crítico + viabilidad democrática (B). A propone regulación que el texto no plantea; C introduce globalización no abordada.", "25": "El tercer párrafo introduce una concesión: reconoce los avances del acceso digital antes de retomar el argumento crítico (C). A confunde concesión con refutación; B inventa estadísticas ausentes.", "26": "'Pensamiento lento' contrasta explícitamente con la lógica del scroll infinito y la aceleración social (A). B y C mencionan elementos favorables del texto, no sus opuestos.", "27": "'Epistemológico' refiere a la teoría del conocimiento: cómo los sujetos construyen, validan y procesan el conocimiento (B). A describe neurología; C describe economía de la información.", "28": "El autor reconoce los beneficios del acceso digital pero cuestiona la ausencia de estructuras cognitivas para procesarlo críticamente (C). A atribuye rechazo total que el texto niega; B introduce neutralidad no sostenida.", "29": "'El que duda, el que coteja, el que se permite...' → repetición de la estructura 'el que' = anáfora (A). Hipérbole (B) exagera; metonimia (C) sustituye por contigüidad.", "30": "La 'ilusión de comprensión' equivale a creer que se leyó un libro por revisar su índice (C). A y B describen el proceso correcto de estudio profundo.", "31": "'No se trata, sin embargo' = conector adversativo que anticipa una objeción y matiza el argumento (B). A atribuye función de consecuencia; C de causa.", "32": "Formal = presencia numérica de mujeres en los cargos; sustantiva = ejercicio real del poder (A). B confunde el ámbito geográfico; C reduce la sustantiva a la reforma de 2019.", "33": "El texto habla de una estructura de poder que se autoperpetúa reproduciendo las condiciones de la exclusión (C). A infiere deliberación que el texto no menciona; B atribuye falta de interés ausente.", "34": "Las candidaturas testimoniales son postulaciones para cumplir formalmente la paridad sin otorgar recursos ni apoyo real (B). A confunde con legisladoras inactivas; C invierte: el TEPJF las sanciona, no las avala.", "35": "'Con todo' introduce una objeción o matiz que reconoce los límites de la reforma (A). B es conclusión favorable; C es conector aclaratorio que no corresponde a la función adversativa.", "36": "La tesis integra paridad formal y la necesidad de avanzar hacia el ejercicio efectivo del poder (B). A solo critica el alcance de la reforma; C reduce la tesis al papel del TEPJF.", "37": "'Piso mínimo' = la paridad total se convirtió en estándar básico e irrenunciable del sistema político (A). B la redefine como objetivo no alcanzado; C invierte el sentido al hablar de límite máximo.", "38": "La estructura es deductiva: parte de la tesis general sobre representación democrática y la particulariza en la legislación mexicana (B). A dice narrativa sin juicios (incorrecto); C dice descriptiva sin relaciones causales (también incorrecto).", "39": "'Descriptiva' se opone a 'sustantiva' según el propio texto: la mera presencia numérica no equivale a incorporación efectiva de perspectivas e intereses (C). A introduce 'normativa', término ajeno; B habla de 'proporcional' que no es la oposición señalada.", "40": "Un partido puede cumplir formalmente la paridad vertical y aun así usar candidaturas testimoniales para obstaculizar la representación real (A). B es incorrecto: el texto no dice que la reforma eliminó las candidaturas testimoniales; C es inferencia sin fundamento.", "41": "Se necesita un conector adversativo: el padrón creció PERO la infraestructura no se amplió. 'No obstante' (B) cumple esa función. 'Por consiguiente' (A) sería causal-consecutivo; 'a saber' (C) es reformulativo.", "42": "'Independientemente de que' expresa que la responsabilidad aplica sin importar el tipo de elección; 'En consecuencia' introduce el deber de coordinación que se deriva de lo anterior. Las otras combinaciones generan incoherencias lógicas.", "43": "La relación es causal-consecutiva: el acceso a la información es un derecho fundamental → EN CONSECUENCIA, su ejercicio requiere procedimientos que garanticen su efectividad. 'Sin embargo' y 'A pesar de ello' son adversativos e incoherentes con el sentido.", "44": "La construcción 'sus ojos ERAN dos luceros' establece una identificación directa sin 'como' ni 'tal como' → metáfora (A). Hipérbole (B) exagera cantidades; sinestesia (C) mezcla sentidos distintos.", "45": "Llenar el océano de lágrimas es una desmesura imposible y desproporcionada → hipérbole (B). Metonimia (A) sustituye por contigüidad; personificación (C) atribuiría una acción humana intencional.", "46": "La repetición de la sílaba 'tar' (tarde, tardía, tardes) crea un efecto fónico expresivo → aliteración (A). Hipérbaton (B) es inversión del orden sintáctico; elipsis (C) omite elementos.", "47": "'Leyó Cervantes' usa el nombre del autor en lugar de su obra → sustitución creador/creación = metonimia (C). Hipérbaton (A) es inversión sintáctica; elipsis (B) omite elementos, lo cual no ocurre aquí.", "48": "Volar hacia la luz que no existe une movimiento con la negación de su destino → paradoja (C). Símil (A) necesita 'como'; hipérbole (B) exagera cantidades.", "49": "Voz pasiva correcta: sujeto paciente + 'ser' conjugado + participio + complemento agente → 'El acuerdo fue aprobado por el Consejo General por unanimidad' (B). A invierte el sentido; C no es estructura pasiva formal.", "50": "'Los funcionarios de casilla fueron capacitados por las juntas distritales' → estructura pasiva clara: ser + participio + agente (A). B y C son oraciones activas.", "51": "La voz pasiva sin agente explícito otorga la impersonalidad característica de los textos institucionales: 'Todos los expedientes fueron revisados' (B). A y C introducen al agente y usan voz activa.", "52": "Las tres formas correctas son: 'prever' (no 'preveer'), 'adecuación' (no 'adecuasión') y 'haber' → opción C. La A tiene 'preveer'; la B tiene 'adecuasión'.", "53": "Según la RAE 2010: 'solo' como adverbio NO lleva tilde; 'él' como pronombre personal SÍ lleva tilde. La opción A cumple ambas reglas. B pone tilde en 'juéz' (incorrecto); C escribe 'sólo' con tilde y 'el' sin tilde (ambos incorrectos).", "54": "No se coloca coma entre el sujeto y el predicado. La opción C presenta la serie enumerativa correctamente sin comas innecesarias. A añade coma de Oxford y coma incorrecta antes del verbo; B coloca la coma en posición errónea.", "55": "'Revocasión' es un error ortográfico: la forma correcta es 'revocación' (B). Las opciones A y C están escritas correctamente.", "56": "En contexto presupuestal, 'austera' significa contenida y restrictiva. Su antónimo es 'pródiga' (generosa, derrochadora) (A). 'Económica' (B) y 'módica' (C) son casi sinónimos de austera, no antónimos.", "57": "En el contexto de una bebida caliente que llegó tibia, el antónimo preciso es 'ardiente' (muy caliente) (C). 'Fresco' (A) y 'helado' (B) apuntan al extremo frío, pero 'ardiente' es el antónimo más preciso en contexto de té.", "58": "'Unánime' significa de todos sin excepción. Su sinónimo más adecuado es 'consensuado' (acordado por todos) (B). 'Singular' (A) es prácticamente su antónimo; 'mayoritario' (C) puede ser solo el 51%, no equivale a unánime.", "59": "'Dilatar' en contexto jurídico = postergar, retrasar. Su antónimo es 'agilizar' (acelerar la resolución) (A). 'Ampliar' (B) y 'expedir' (C) no son antónimos de dilatar en este contexto.", "60": "La opción C usa voz pasiva, léxico institucional preciso ('pertinentes', 'cabal cumplimiento', 'plazos establecidos') y estructura sin redundancias. A y B usan voz activa y registro menos formal."};
+const SK='spen2026_modA_v2';
+let IDX=0,RESP={},TV={},BSEL='todos';
+
+function primerIdx(b){
+  if(b==='todos')return 0;
+  const nums=BLOQUES[b];if(!nums)return 0;
+  const i=RX.findIndex(r=>r.n===nums[0]);
+  return i>=0?i:0;
+}
+
+window.addEventListener('load',function(){
+  renderGrid();
+  try{
+    const s=JSON.parse(localStorage.getItem(SK));
+    if(s&&s.resp&&Object.keys(s.resp).length>0){
+      RESP=s.resp;TV=s.tv||{};
+      const n=Object.keys(s.resp).length;
+      const pct=Math.round(n/RX.length*100);
+      const ts=s.ts?new Date(s.ts).toLocaleString('es-MX'):'';
+      document.getElementById('ban-txt').textContent='Pregunta '+(s.idx+1)+' de '+RX.length+' — '+pct+'% completado. Último acceso: '+ts;
+      document.getElementById('banner-prog').style.display='block';
+      actualizarGrid();
+    }
+  }catch(e){}
+  selBloque('todos');
+});
+
+function renderGrid(){
+  const g=document.getElementById('bloques-grid');g.innerHTML='';
+  Object.entries(BLOQUES).forEach(([nombre,nums])=>{
+    const resp=nums.filter(n=>{const i=RX.findIndex(r=>r.n===n);return i>=0&&RESP[i]!==undefined;}).length;
+    const d=document.createElement('div');d.className='bcard';
+    d.id='bc_'+nombre.replace(/\W/g,'_');
+    d.innerHTML='<div><div class="bn">'+nombre+'</div><div class="bc">'+nums.length+' reactivos</div></div>'
+      +'<div class="bp" id="bp_'+nombre.replace(/\W/g,'_')+'">'+resp+'/'+nums.length+'</div>';
+    d.onclick=()=>selBloque(nombre);
+    g.appendChild(d);
+  });
+}
+function actualizarGrid(){
+  Object.entries(BLOQUES).forEach(([nombre,nums])=>{
+    const resp=nums.filter(n=>{const i=RX.findIndex(r=>r.n===n);return i>=0&&RESP[i]!==undefined;}).length;
+    const el=document.getElementById('bp_'+nombre.replace(/\W/g,'_'));
+    if(el)el.textContent=resp+'/'+nums.length;
+  });
+}
+function selBloque(b){
+  BSEL=b;
+  document.querySelectorAll('.bcard').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('btn-todos').classList.remove('sel');
+  if(b==='todos'){
+    document.getElementById('btn-todos').classList.add('sel');
+    document.getElementById('btn-com').textContent='COMENZAR EXAMEN COMPLETO →';
+  }else{
+    const c=document.getElementById('bc_'+b.replace(/\W/g,'_'));
+    if(c)c.classList.add('sel');
+    const label=b.length>28?b.substring(0,28)+'…':b;
+    document.getElementById('btn-com').textContent='COMENZAR: '+label+' →';
+  }
+}
+function guardar(){
+  try{
+    localStorage.setItem(SK,JSON.stringify({idx:IDX,resp:RESP,tv:TV,ts:Date.now()}));
+    const el=document.getElementById('sv');
+    if(el){el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800);}
+  }catch(e){}
+}
+function cargar(){try{return JSON.parse(localStorage.getItem(SK));}catch(e){return null;}}
+function limpiar(){localStorage.removeItem(SK);}
+function mostrar(id){
+  document.querySelectorAll('.pantalla').forEach(p=>p.classList.remove('activa'));
+  document.getElementById(id).classList.add('activa');
+}
+function comenzar(){IDX=primerIdx(BSEL);mostrar('examen');renderNav();mostrarRX();}
+function continuarGuardado(){const s=cargar();if(s){IDX=s.idx||0;RESP=s.resp||{};TV=s.tv||{};}mostrar('examen');renderNav();mostrarRX();}
+function pedirReinicio(){
+  if(confirm('¿Seguro? Se borrará todo el progreso guardado.')){
+    limpiar();RESP={};IDX=0;TV={};
+    document.getElementById('banner-prog').style.display='none';
+    actualizarGrid();selBloque('todos');
+  }
+}
+function irInicio(){cerrarMM();actualizarGrid();mostrar('inicio');}
+function abrirMM(){
+  const opts=document.getElementById('mm-opts');opts.innerHTML='';
+  Object.entries(BLOQUES).forEach(([nombre,nums])=>{
+    const cor=nums.filter(n=>{const i=RX.findIndex(r=>r.n===n);return i>=0&&RESP[i]?.correcto;}).length;
+    const d=document.createElement('div');d.className='mm-opt';
+    d.innerHTML='<div class="mn">'+nombre+'</div><div class="mr">'+cor+'/'+nums.length+' ✓</div>';
+    d.onclick=()=>cambiarBloque(nombre);opts.appendChild(d);
+  });
+  const sep=document.createElement('div');sep.className='mm-sep';opts.appendChild(sep);
+  const home=document.createElement('div');home.className='mm-opt';
+  home.innerHTML='<div class="mn" style="color:var(--muted)">🏠 Menú principal</div><div class="mr">←</div>';
+  home.onclick=irInicio;opts.appendChild(home);
+  document.getElementById('mmenu').classList.add('show');
+}
+function cerrarMM(e){if(!e||e.target===document.getElementById('mmenu'))document.getElementById('mmenu').classList.remove('show');}
+function cambiarBloque(b){cerrarMM();IDX=primerIdx(b);mostrarRX();renderNav();}
+function renderNav(){
+  const nav=document.getElementById('navlat');nav.innerHTML='';
+  RX.forEach((r,i)=>{
+    const d=document.createElement('button');d.className='nd';d.textContent=i+1;
+    d.title='#'+r.n+' '+r.b;
+    const rp=RESP[i];
+    if(i===IDX)d.classList.add('act');
+    else if(rp){if(rp.correcto)d.classList.add('ok');else d.classList.add('mal');}
+    else{d.classList.add('pend');d.disabled=true;}
+    if(i<=IDX)d.onclick=()=>irA(i);
+    nav.appendChild(d);
+  });
+  const dots=nav.querySelectorAll('.nd');
+  if(dots[IDX])dots[IDX].scrollIntoView({block:'nearest'});
+}
+function irA(i){if(i>IDX)return;IDX=i;mostrarRX();}
+function mostrarRX(){
+  if(IDX>=RX.length){mostrarRes();return;}
+  guardar();
+  const yaResp=RESP[IDX]!==undefined;
+  const rx=RX[IDX];
+  document.getElementById('hpi').textContent=(IDX+1)+' / '+RX.length;
+  document.getElementById('pb').style.width=(IDX/RX.length*100)+'%';
+  document.getElementById('hblq').textContent=rx.b;
+  let h='';
+  if(rx.t){
+    if(TV[rx.t]){
+      h+='<div class="texto-oculto">⚠️ '+TLABELS[rx.t]+' — Este texto ya no está disponible (avanzaste de bloque). Responde con base en lo que recuerdas.</div>';
+    }else{
+      h+='<div class="texto-wrap">'
+        +'<div class="texto-aviso">⚠️ Este texto desaparecerá al avanzar al siguiente bloque de texto</div>'
+        +'<div class="texto-titulo">'+TLABELS[rx.t]+'</div>'
+        +'<div class="texto-cuerpo">'+esc(TEXTOS[rx.t])+'</div>'
+        +'</div>';
+    }
+  }
+  h+='<div class="rnum">Reactivo #'+rx.n+'</div>';
+  h+='<div class="rblq">'+esc(rx.b)+'</div>';
+  h+='<div class="enun">'+esc(rx.e)+'</div>';
+  h+='<div class="opts">';
+  ['a','b','c'].forEach(l=>{
+    if(rx.opts[l]!==undefined){
+      h+='<button class="opt" id="opt_'+l+'" onclick="responder(\''+l+'\')"><span class="ltr">'+l.toUpperCase()+')</span><span>'+esc(rx.opts[l])+'</span></button>';
+    }
+  });
+  h+='</div><div class="corr-panel" id="cpanel"></div>';
+  h+='<div class="navbtns"><div class="navleft">'
+    +'<button class="btn btn-s" id="bant" onclick="irAnterior()" '+(IDX===0?'disabled':'')+'>← Anterior</button>'
+    +'</div>'
+    +'<button class="btn btn-p" id="bcont" onclick="continuar()" disabled>'
+    +(IDX<RX.length-1?'Continuar →':'Ver resultados →')
+    +'</button></div>';
+  document.getElementById('cuerpo').innerHTML=h;
+  if(yaResp){
+    const rp=RESP[IDX];
+    const el=document.getElementById('opt_'+rp.letra);if(el)el.classList.add('sel');
+    bloquearOpts();mostrarCorr(rp);
+    document.getElementById('bcont').disabled=false;
+  }
+  renderNav();
+}
+function responder(l){
+  if(RESP[IDX]!==undefined)return;
+  const rx=RX[IDX];
+  const cor=l===rx.r;
+  RESP[IDX]={letra:l,correcto:cor};
+  guardar();
+  const el=document.getElementById('opt_'+l);if(el)el.classList.add('sel');
+  bloquearOpts();mostrarCorr(RESP[IDX]);
+  const bc=document.getElementById('bcont');if(bc)bc.disabled=false;
+  renderNav();
+}
+function bloquearOpts(){
+  const rx=RX[IDX];
+  ['a','b','c'].forEach(l=>{
+    const el=document.getElementById('opt_'+l);if(!el)return;
+    el.disabled=true;
+    if(l===rx.r)el.classList.add('ok-rev');
+  });
+}
+function mostrarCorr(rp){
+  const rx=RX[IDX];
+  const panel=document.getElementById('cpanel');if(!panel)return;
+  let tit,cls;
+  if(rp.correcto){
+    tit='✅ ¡Correcto!';cls='ok-p';
+    const el=document.getElementById('opt_'+rp.letra);
+    if(el){el.classList.remove('sel');el.classList.add('ok');}
+  }else{
+    tit='❌ Incorrecto — La respuesta correcta es: '+rx.r.toUpperCase()+') '+rx.opts[rx.r];
+    cls='err-p';
+    const em=document.getElementById('opt_'+rp.letra);if(em){em.classList.remove('sel');em.classList.add('mal');}
+    const ec=document.getElementById('opt_'+rx.r);if(ec){ec.classList.remove('ok-rev');ec.classList.add('ok');}
+  }
+  const just=JUST[String(rx.n)]||'';
+  panel.className='corr-panel '+cls;
+  panel.innerHTML='<div class="ct">'+esc(tit)+'</div>'+(just?'<div class="jt">'+esc(just)+'</div>':'');
+  panel.style.display='block';
+}
+function continuar(){
+  const rxA=RX[IDX];
+  const rxS=IDX+1<RX.length?RX[IDX+1]:null;
+  if(rxA.t&&rxS&&rxS.t!==rxA.t)TV[rxA.t]=true;
+  if(rxA.t&&rxS&&!rxS.t)TV[rxA.t]=true;
+  if(IDX<RX.length-1){IDX++;mostrarRX();}else mostrarRes();
+}
+function irAnterior(){if(IDX>0){IDX--;mostrarRX();}}
+function mostrarRes(){
+  guardar();mostrar('resultados');
+  let tc=0;
+  const rb={};
+  Object.entries(BLOQUES).forEach(([nombre,nums])=>{
+    let c=0,ic=0;
+    nums.forEach(n=>{
+      const i=RX.findIndex(r=>r.n===n);
+      const rp=i>=0?RESP[i]:undefined;
+      if(!rp)ic++;else if(rp.correcto)c++;else ic++;
+    });
+    rb[nombre]={c,ic,t:nums.length};tc+=c;
+  });
+  const total=RX.length;
+  const cal=(tc/total*10).toFixed(2);
+  const ap=parseFloat(cal)>=7;
+  const cg=document.getElementById('calg');
+  cg.textContent=cal;cg.className='calg '+(ap?'ap':'rep');
+  document.getElementById('rsub').textContent=tc+' correctas · '+(total-tc)+' incorrectas · '+Object.keys(RESP).length+'/'+total+' respondidas';
+  const wrap=document.getElementById('bres-wrap');wrap.innerHTML='';
+  Object.entries(rb).forEach(([nombre,r])=>{
+    const c2=(r.c/r.t*10).toFixed(1);
+    const ap2=parseFloat(c2)>=7;
+    const pct=Math.round(r.c/r.t*100);
+    const div=document.createElement('div');div.className='bres';
+    div.innerHTML='<div class="bres-nm">'+nombre+'</div>'
+      +'<div class="bres-r">'
+      +'<div class="bres-bar"><div class="bres-bf" style="width:0%;background:'+(ap2?'var(--green)':'var(--red)')+'" data-w="'+pct+'"></div></div>'
+      +'<div class="bres-det">'+r.c+'/'+r.t+'</div>'
+      +'<div class="bres-cal '+(ap2?'ap':'rep')+'">'+c2+'</div>'
+      +'</div>';
+    wrap.appendChild(div);
+  });
+  setTimeout(()=>document.querySelectorAll('.bres-bf').forEach(e=>e.style.width=e.dataset.w+'%'),100);
+  const tb=document.getElementById('tbody');tb.innerHTML='';
+  RX.forEach((rx,i)=>{
+    const rp=RESP[i];
+    let est,ec,tr2;
+    if(!rp){est='—';ec='';tr2='—';}
+    else if(rp.correcto){est='✓';ec='bok';tr2=rp.letra.toUpperCase();}
+    else{est='✗';ec='bmal';tr2=(rp.letra||'—').toUpperCase();}
+    const trunc=rx.e.replace(/\n/g,' ').substring(0,60)+'…';
+    const tr=document.createElement('tr');
+    const jcls=(!rp||!rp.correcto)?'bjust inc':'bjust';
+    tr.innerHTML='<td>'+rx.n+'</td>'
+      +'<td style="font-size:.7rem;white-space:nowrap">'+esc(rx.b.substring(0,16))+'…</td>'
+      +'<td class="tdp">'+esc(trunc)+'</td>'
+      +'<td>'+tr2+'</td><td>'+rx.r.toUpperCase()+'</td>'
+      +'<td class="'+ec+'">'+est+'</td>'
+      +'<td><button class="'+jcls+'" onclick="abrirMod('+i+')">?</button></td>';
+    tb.appendChild(tr);
+  });
+}
+function abrirMod(i){
+  const rx=RX[i],rp=RESP[i];
+  document.getElementById('mt').textContent='Reactivo #'+rx.n+' — '+rx.b;
+  document.getElementById('me').textContent=rx.e;
+  let rt,rc;
+  if(!rp){rt='Sin respuesta';rc='mal';}
+  else if(rp.correcto){rt='✅ Tu respuesta: '+rp.letra.toUpperCase()+') '+rx.opts[rp.letra];rc='ok';}
+  else{rt='❌ Tu respuesta: '+(rp.letra||'—').toUpperCase()+') '+(rx.opts[rp.letra]||'');rc='mal';}
+  const re=document.getElementById('mr');re.textContent=rt;re.className='mresp '+rc;
+  document.getElementById('msol').innerHTML='<strong>✅ Respuesta correcta: '+rx.r.toUpperCase()+') '+esc(rx.opts[rx.r])+'</strong>'
+    +(JUST[String(rx.n)]?'<span style="color:var(--muted);font-size:.82rem;display:block;margin-top:6px">'+esc(JUST[String(rx.n)])+'</span>':'');
+  document.getElementById('movlay').classList.add('show');
+}
+function cerrarMod(e){if(!e||e.target===document.getElementById('movlay'))document.getElementById('movlay').classList.remove('show');}
+function dlCSV(){
+  let c='\uFEFF';
+  c+='#,Bloque,Tu Respuesta,Respuesta Correcta,Estado\n';
+  RX.forEach((rx,i)=>{
+    const rp=RESP[i];
+    const tr=!rp?'—':(rp.letra||'—').toUpperCase();
+    const est=!rp?'Sin responder':rp.correcto?'Correcto':'Incorrecto';
+    c+=rx.n+',\"'+rx.b+'\",'+tr+','+rx.r.toUpperCase()+','+est+'\n';
+  });
+  const cor=Object.values(RESP).filter(r=>r.correcto).length;
+  c+='\nTOTAL,,,'+cor+'/'+RX.length+' = '+(cor/RX.length*10).toFixed(2)+'/10,';
+  dl('modA_v2_resultados.csv',c,'text/csv;charset=utf-8');
+}
+function dlTXT(){
+  const cor=Object.values(RESP).filter(r=>r.correcto).length;
+  let t='=== RESULTADOS MÓDULO A v2 — LENGUAJE Y COMUNICACIÓN ===\n';
+  t+='Fecha: '+new Date().toLocaleString('es-MX')+'\n\n';
+  t+='Calificación global: '+(cor/RX.length*10).toFixed(2)+'/10\n';
+  t+='Correctas: '+cor+' · Incorrectas: '+(RX.length-cor)+'\n\n';
+  Object.entries(BLOQUES).forEach(([nombre,nums])=>{
+    const c2=nums.filter(n=>{const i=RX.findIndex(r=>r.n===n);return i>=0&&RESP[i]?.correcto;}).length;
+    t+=nombre+': '+c2+'/'+nums.length+' = '+(c2/nums.length*10).toFixed(1)+'/10\n';
+  });
+  t+='\n--- INCORRECTAS ---\n';
+  RX.forEach((rx,i)=>{
+    const rp=RESP[i];
+    if(rp&&!rp.correcto){
+      t+='\n#'+rx.n+' ['+rx.b+']\n';
+      t+='Pregunta: '+rx.e.replace(/\n/g,' ').substring(0,100)+'\n';
+      t+='Tu resp: '+(rp.letra||'—').toUpperCase()+' | Correcta: '+rx.r.toUpperCase()+') '+rx.opts[rx.r]+'\n';
+      if(JUST[String(rx.n)])t+='Justificación: '+JUST[String(rx.n)]+'\n';
+    }
+  });
+  dl('modA_v2_resultados.txt',t,'text/plain;charset=utf-8');
+}
+function dl(n,c,t){
+  const b=new Blob([c],{type:t});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);a.download=n;a.click();
+  URL.revokeObjectURL(a.href);
+}
+function esc(s){
+  if(!s)return'';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+</body>
+</html>
